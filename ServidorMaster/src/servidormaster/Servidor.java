@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 import javax.swing.JTextArea;
 import javax.swing.Timer;
 import javax.swing.plaf.basic.BasicSliderUI;
@@ -58,11 +59,16 @@ public class Servidor extends javax.swing.JFrame {
         txtDisponibles = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel1.setText("Server status: Running");
 
-        labelImagen.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        labelImagen.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         labelImagen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/libros-grande.jpg"))); // NOI18N
 
         restart.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
@@ -75,6 +81,11 @@ public class Servidor extends javax.swing.JFrame {
 
         adjust.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         adjust.setText("CLOCK ADJUSTMENT");
+        adjust.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                adjustActionPerformed(evt);
+            }
+        });
 
         txtDisponibles.setColumns(20);
         txtDisponibles.setRows(5);
@@ -84,39 +95,41 @@ public class Servidor extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(149, 149, 149)
-                        .addComponent(adjust))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(193, 193, 193)
-                        .addComponent(restart))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(145, 145, 145)
-                        .addComponent(jLabel1))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(107, 107, 107)
-                        .addComponent(labelImagen, javax.swing.GroupLayout.PREFERRED_SIZE, 266, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(47, 47, 47)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 371, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(64, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 371, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(175, 175, 175))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(adjust)
+                        .addGap(272, 272, 272))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(restart)
+                        .addGap(306, 306, 306))))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(107, 107, 107)
+                .addComponent(labelImagen, javax.swing.GroupLayout.PREFERRED_SIZE, 559, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(70, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel1)
+                .addGap(267, 267, 267))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(36, 36, 36)
+                .addGap(29, 29, 29)
                 .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(labelImagen, javax.swing.GroupLayout.PREFERRED_SIZE, 194, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
+                .addComponent(labelImagen, javax.swing.GroupLayout.PREFERRED_SIZE, 494, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(restart)
                 .addGap(18, 18, 18)
                 .addComponent(adjust)
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(33, Short.MAX_VALUE))
+                .addGap(45, 45, 45))
         );
 
         pack();
@@ -134,6 +147,18 @@ public class Servidor extends javax.swing.JFrame {
         txtDisponibles.setText(disponibles);
     }//GEN-LAST:event_restartActionPerformed
 
+    private void adjustActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_adjustActionPerformed
+        // TODO add your handling code here:
+        
+    }//GEN-LAST:event_adjustActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        // TODO add your handling code here:
+    }//GEN-LAST:event_formWindowClosing
+    
+    public void actionPerformed(ActionEvent ae){
+        
+    }
     /**
      * @param args the command line arguments
      */
@@ -143,10 +168,12 @@ public class Servidor extends javax.swing.JFrame {
         try{
             // Instantiate a new DatagramSocket to receive responses from the client
             DatagramSocket serverSocket = new DatagramSocket(SERVICE_PORT);
-
+            ArrayList<String> lista = new ArrayList<>();
             
 
             for(;;){
+                
+                
                 /* Create buffers to hold sending and receiving data.
                 It temporarily stores data in case of communication delays */
                 byte[] receivingDataBuffer = new byte[1024];
@@ -182,42 +209,68 @@ public class Servidor extends javax.swing.JFrame {
                     //Con el nombre mostrar la imagen
                     conexion conn = new conexion();
                     conn.conectar();
-                    ArrayList<String> lista = new ArrayList<>();
                     lista = conn.dpp();
                     int random = lista.size();
-                    Random rn = new Random();
-                    String libro = lista.get(rn.nextInt(random));
-                    System.out.println(conn.conectado());
-                    //conn.prestamo();
-                    conn.prestamo(libro);
+                    if(random > 0){
+                        Random rn = new Random();
+                        String libro = lista.get(rn.nextInt(random));
+                        System.out.println(conn.conectado());
+                        System.out.println("LIBRO ELEGIDO: "+ libro);
+                        //conn.prestamo();
+                        conn.prestamo(libro);
+                        String disponibles;
+                        disponibles = conn.disponibilidad();
+                        conn.desconectar();
+                        s.txtDisponibles.setText(disponibles);
+                        s.labelImagen.setIcon(new ImageIcon
+                        ("C:\\Users\\emili\\Desktop\\ServidorJava\\ServidorMaster\\src\\img\\"+libro+".jpg"));
+                        sendingDataBuffer = libro.toUpperCase().getBytes();
+                    }else{
+                        String libro = "AGOTADO";
+                        sendingDataBuffer = libro.toUpperCase().getBytes();
+                        conn.desconectar();
+                        s.labelImagen.setIcon(new ImageIcon
+                        ("C:\\Users\\emili\\Desktop\\ServidorJava\\ServidorMaster\\src\\img\\liibros-grande.jpg"));
+                    }
+                    
+                    
+                }else if(receivedData.contains("RESET")){
+                    //Pedir libros disponibles hacer random entre la lista y devolver nombre
+                    //Con el nombre mostrar la imagen
+                    conexion conn = new conexion();
+                    conn.conectar();
+                    conn.reset();
                     String disponibles;
                     disponibles = conn.disponibilidad();
-                    s.txtDisponibles.setText(disponibles);
+                    System.out.println(conn.conectado());
                     conn.desconectar();
-                    
+                    s.txtDisponibles.setText(disponibles);
+                    String libro = "OK";
                     sendingDataBuffer = libro.toUpperCase().getBytes();
+                    
+                    
                 }   
-                
-                // Obtain client's IP address and the port
-                InetAddress senderAddress = inputPacket.getAddress();
-                int senderPort = inputPacket.getPort();
 
-                // Create new UDP packet with data to send to the client
-                DatagramPacket outputPacket = new DatagramPacket(
-                  sendingDataBuffer, sendingDataBuffer.length,
-                  senderAddress,senderPort
-                );
+                    // Obtain client's IP address and the port
+                    InetAddress senderAddress = inputPacket.getAddress();
+                    int senderPort = inputPacket.getPort();
 
-                // Send the created packet to client
-                serverSocket.send(outputPacket);
-                // Close the socket connection
-                //serverSocket.close();
-            }
-        }catch (SocketException e){
-          e.printStackTrace();
-        } catch (IOException ex) {
-          Logger.getLogger(Servidor.class.getName()).log(Level.SEVERE, null, ex);
-      }
+                    // Create new UDP packet with data to send to the client
+                    DatagramPacket outputPacket = new DatagramPacket(
+                      sendingDataBuffer, sendingDataBuffer.length,
+                      senderAddress,senderPort
+                    );
+                    sendingDataBuffer = null;
+                    // Send the created packet to client
+                    serverSocket.send(outputPacket);
+                    // Close the socket connection
+                    //serverSocket.close();
+                }
+            }catch (SocketException e){
+              e.printStackTrace();
+            } catch (IOException ex) {
+              Logger.getLogger(Servidor.class.getName()).log(Level.SEVERE, null, ex);
+          }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

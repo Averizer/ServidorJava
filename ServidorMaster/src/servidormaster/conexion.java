@@ -63,14 +63,14 @@ public class conexion {
             
             // our SQL SELECT query. 
             // if you only need a few columns, specify them by name instead of using "*"
-            String query = "SELECT nombre, autor, disponible FROM libro where disponible = DISPONIBLE";
+            String query = "SELECT nombre, autor, disponible FROM libro where disponible = 'DISPONIBLE'";
 
             // create the java statement
             Statement st = conn.createStatement();
 
             // execute the query, and get a java resultset
             ResultSet rs = st.executeQuery(query);
-
+            System.out.println("--------------LIBROS DISPONIBLES--------------------");
             // iterate through the java resultset
             while (rs.next())
             {
@@ -100,7 +100,7 @@ public class conexion {
         try{
             // our SQL SELECT query. 
             // if you only need a few columns, specify them by name instead of using "*"
-            String query = "SELECT nombre FROM libro where disponible = DISPONIBLE";
+            String query = "SELECT nombre FROM libro where libro.disponible = 'DISPONIBLE'";
 
             // create the java statement
             Statement st = conn.createStatement();
@@ -129,7 +129,7 @@ public class conexion {
     public void prestamo(String cambio){
         try{
             // create the java mysql update preparedstatement
-            String query = "update libro set disponible =? where nombre =?";
+            String query = "update libro set disponible =? where nombre = ?";
             PreparedStatement preparedStmt = conn.prepareStatement(query);
             preparedStmt.setString(1, "AGOTADO");
             preparedStmt.setString(2, cambio);
@@ -146,7 +146,7 @@ public class conexion {
     public void reset(){
         try{
             // create the java mysql update preparedstatement
-            String query = "update libro set disponible =? where disponible =?";
+            String query = "update libro set disponible = ? where disponible = ?";
             PreparedStatement preparedStmt = conn.prepareStatement(query);
             preparedStmt.setString(1, "DISPONIBLE");
             preparedStmt.setString(2, "AGOTADO");
