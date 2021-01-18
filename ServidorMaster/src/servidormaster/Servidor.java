@@ -12,6 +12,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Random;
@@ -28,7 +29,6 @@ import javax.swing.plaf.basic.BasicSliderUI;
 public class Servidor extends javax.swing.JFrame {
     public final static int SERVICE_PORT=10000;
     
-      
     public Servidor() {
         conexion conn = new conexion();
         conn.conectar();
@@ -145,6 +145,30 @@ public class Servidor extends javax.swing.JFrame {
         System.out.println(conn.conectado());
         conn.desconectar();
         txtDisponibles.setText(disponibles);
+        
+        DatagramSocket respaldoSocket;
+        try {
+            respaldoSocket = new DatagramSocket();
+            String ipreslpaldo = "192.168.0.195";
+            InetAddress ipRespaldo = InetAddress.getByName(ipreslpaldo);
+            byte[] receivingDataBuffer2 = new byte[1024];
+            byte[] sendingDataBuffer2 = new byte[1024];
+            String sentence = "RESET";
+            sendingDataBuffer2 = sentence.getBytes();
+            DatagramPacket sendingPacket2 = new DatagramPacket(sendingDataBuffer2, sendingDataBuffer2.length, ipRespaldo, SERVICE_PORT);
+            respaldoSocket.send(sendingPacket2);
+            DatagramPacket rec = new DatagramPacket(receivingDataBuffer2, receivingDataBuffer2.length, ipRespaldo, SERVICE_PORT);
+            respaldoSocket.receive(rec);
+            respaldoSocket.close();
+        } catch (SocketException ex) {
+            Logger.getLogger(Servidor.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(Servidor.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Servidor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
     }//GEN-LAST:event_restartActionPerformed
 
     private void adjustActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_adjustActionPerformed
@@ -186,7 +210,7 @@ public class Servidor extends javax.swing.JFrame {
 
                 // Receive data from the client and store in inputPacket
                 serverSocket.receive(inputPacket);
-
+                
                 // Printing out the client sent data
                 String receivedData = new String(inputPacket.getData());
                 System.out.println("ORDEN DEL CLIENTE: "+receivedData);
@@ -203,7 +227,19 @@ public class Servidor extends javax.swing.JFrame {
                     conn.desconectar();
                     s.txtDisponibles.setText(disponibles);
                     sendingDataBuffer = respuesta.toUpperCase().getBytes();
-
+                    //-----------------REPLICADO----------------------
+                    DatagramSocket respaldoSocket = new DatagramSocket();
+                    String ipreslpaldo = "192.168.0.195";
+                    InetAddress ipRespaldo = InetAddress.getByName(ipreslpaldo);
+                    byte[] receivingDataBuffer2 = new byte[1024];
+                    byte[] sendingDataBuffer2 = new byte[1024];
+                    String sentence = "INICIO";
+                    sendingDataBuffer2 = sentence.getBytes();
+                    DatagramPacket sendingPacket2 = new DatagramPacket(sendingDataBuffer2, sendingDataBuffer2.length, ipRespaldo, SERVICE_PORT);
+                    respaldoSocket.send(sendingPacket2);
+                    DatagramPacket rec = new DatagramPacket(receivingDataBuffer2, receivingDataBuffer2.length, ipRespaldo, SERVICE_PORT);
+                    respaldoSocket.receive(rec);
+                    respaldoSocket.close();
                 }else if(receivedData.contains("ASK")){
                     //Pedir libros disponibles hacer random entre la lista y devolver nombre
                     //Con el nombre mostrar la imagen
@@ -211,6 +247,7 @@ public class Servidor extends javax.swing.JFrame {
                     conn.conectar();
                     lista = conn.dpp();
                     int random = lista.size();
+                    
                     if(random > 0){
                         Random rn = new Random();
                         String libro = lista.get(rn.nextInt(random));
@@ -218,6 +255,7 @@ public class Servidor extends javax.swing.JFrame {
                         System.out.println("LIBRO ELEGIDO: "+ libro);
                         //conn.prestamo();
                         conn.prestamo(libro);
+                        //conn.prestamo2(ip, libro, nombre);
                         String disponibles;
                         disponibles = conn.disponibilidad();
                         conn.desconectar();
@@ -225,12 +263,39 @@ public class Servidor extends javax.swing.JFrame {
                         s.labelImagen.setIcon(new ImageIcon
                         ("C:\\Users\\emili\\Desktop\\ServidorJava\\ServidorMaster\\src\\img\\"+libro+".jpg"));
                         sendingDataBuffer = libro.toUpperCase().getBytes();
+                        
+                        //-----------------REPLICADO----------------------
+                        DatagramSocket respaldoSocket = new DatagramSocket();
+                        String ipreslpaldo = "192.168.0.195";
+                        InetAddress ipRespaldo = InetAddress.getByName(ipreslpaldo);
+                        byte[] receivingDataBuffer2 = new byte[1024];
+                        byte[] sendingDataBuffer2 = new byte[1024];
+                        String sentence = "ASK -"+libro;
+                        sendingDataBuffer2 = sentence.getBytes();
+                        DatagramPacket sendingPacket2 = new DatagramPacket(sendingDataBuffer2, sendingDataBuffer2.length, ipRespaldo, SERVICE_PORT);
+                        respaldoSocket.send(sendingPacket2);
+                        DatagramPacket rec = new DatagramPacket(receivingDataBuffer2, receivingDataBuffer2.length, ipRespaldo, SERVICE_PORT);
+                        respaldoSocket.receive(rec);
+                        respaldoSocket.close();
                     }else{
                         String libro = "AGOTADO";
                         sendingDataBuffer = libro.toUpperCase().getBytes();
                         conn.desconectar();
                         s.labelImagen.setIcon(new ImageIcon
                         ("C:\\Users\\emili\\Desktop\\ServidorJava\\ServidorMaster\\src\\img\\liibros-grande.jpg"));
+                        //-----------------REPLICADO----------------------
+                        DatagramSocket respaldoSocket = new DatagramSocket();
+                        String ipreslpaldo = "192.168.0.195";
+                        InetAddress ipRespaldo = InetAddress.getByName(ipreslpaldo);
+                        byte[] receivingDataBuffer2 = new byte[1024];
+                        byte[] sendingDataBuffer2 = new byte[1024];
+                        String sentence = "AGOTADO";
+                        sendingDataBuffer2 = sentence.getBytes();
+                        DatagramPacket sendingPacket2 = new DatagramPacket(sendingDataBuffer2, sendingDataBuffer2.length, ipRespaldo, SERVICE_PORT);
+                        respaldoSocket.send(sendingPacket2);
+                        DatagramPacket rec = new DatagramPacket(receivingDataBuffer2, receivingDataBuffer2.length, ipRespaldo, SERVICE_PORT);
+                        respaldoSocket.receive(rec);
+                        respaldoSocket.close();
                     }
                     
                     
@@ -247,6 +312,19 @@ public class Servidor extends javax.swing.JFrame {
                     s.txtDisponibles.setText(disponibles);
                     String libro = "OK";
                     sendingDataBuffer = libro.toUpperCase().getBytes();
+                    //-----------------REPLICADO----------------------
+                    DatagramSocket respaldoSocket = new DatagramSocket();
+                    String ipreslpaldo = "192.168.0.195";
+                    InetAddress ipRespaldo = InetAddress.getByName(ipreslpaldo);
+                    byte[] receivingDataBuffer2 = new byte[1024];
+                    byte[] sendingDataBuffer2 = new byte[1024];
+                    String sentence = "RESET";
+                    sendingDataBuffer2 = sentence.getBytes();
+                    DatagramPacket sendingPacket2 = new DatagramPacket(sendingDataBuffer2, sendingDataBuffer2.length, ipRespaldo, SERVICE_PORT);
+                    respaldoSocket.send(sendingPacket2);
+                    DatagramPacket rec = new DatagramPacket(receivingDataBuffer2, receivingDataBuffer2.length, ipRespaldo, SERVICE_PORT);
+                    respaldoSocket.receive(rec);
+                    respaldoSocket.close();
                     
                     
                 }   

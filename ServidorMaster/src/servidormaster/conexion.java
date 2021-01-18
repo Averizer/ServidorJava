@@ -159,6 +159,31 @@ public class conexion {
             System.err.println(e.getMessage());
         }
     }
+    
+    public void resetClientes(){
+        try{
+            // create the java mysql update preparedstatement
+            String query = "update libro set disponible = ? where disponible = ?";
+            PreparedStatement preparedStmt = conn.prepareStatement(query);
+            preparedStmt.setString(1, "DISPONIBLE");
+            preparedStmt.setString(2, "AGOTADO");
+            preparedStmt.executeUpdate();
+            System.out.println("TODO DISPONIBLE");
+            Statement stmt = (Statement) conn.createStatement();
+            String req = "UPDATE libro SET disponible='DISPONIBLE';";
+            stmt.executeQuery(req);
+            req = "DELETE FROM pedido";
+            stmt.executeUpdate(req);
+            req = "DELETE FROM usuario";
+            stmt.executeUpdate(req);
+            req = "DELETE FROM sesion";
+            stmt.executeUpdate(req);
+            System.out.println ("Base reiniciada");
+        }catch (Exception e){
+            System.err.println("Error al resetear! ");
+            System.err.println(e.getMessage());
+        }
+    }
 }
 
 
