@@ -14,6 +14,9 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.sql.Date;
+import java.sql.SQLException;
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.logging.Level;
@@ -186,7 +189,7 @@ public class Servidor extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
+    public static void main(String args[]) throws SQLException {
         Servidor s = new Servidor();
         s.setVisible(true);
         try{
@@ -207,14 +210,16 @@ public class Servidor extends javax.swing.JFrame {
                 client data using the buffer for receiving data*/
                 DatagramPacket inputPacket = new DatagramPacket(receivingDataBuffer, receivingDataBuffer.length);
                 System.out.println("Waiting for a client to connect...");
-
+                String horai = LocalDateTime.now(Clock.systemUTC()).toString();
+                String horaInicio = horai.substring(11, horai.length()-1);
                 // Receive data from the client and store in inputPacket
                 serverSocket.receive(inputPacket);
                 
                 // Printing out the client sent data
                 String receivedData = new String(inputPacket.getData());
                 System.out.println("ORDEN DEL CLIENTE: "+receivedData);
-                
+                InetAddress ip = inputPacket.getAddress();
+                System.out.println("LA DIRECCION ES: "+ ip.toString());
                 if(receivedData.contains("INICIO")){
                     System.out.println("EJECUCION DE INICIO, CARGANDO LIBROS DISPONIBLES");
                     //AQUI SE PIDE LA LISTA DE LOS LIBROS Y SE REGRESA AL CLIENTE
@@ -258,7 +263,7 @@ public class Servidor extends javax.swing.JFrame {
                         //conn.prestamo2(ip, libro, nombre);
                         String disponibles;
                         disponibles = conn.disponibilidad();
-                        conn.desconectar();
+                        
                         s.txtDisponibles.setText(disponibles);
                         s.labelImagen.setIcon(new ImageIcon
                         ("C:\\Users\\emili\\Desktop\\ServidorJava\\ServidorMaster\\src\\img\\"+libro+".jpg"));
@@ -277,6 +282,11 @@ public class Servidor extends javax.swing.JFrame {
                         DatagramPacket rec = new DatagramPacket(receivingDataBuffer2, receivingDataBuffer2.length, ipRespaldo, SERVICE_PORT);
                         respaldoSocket.receive(rec);
                         respaldoSocket.close();
+                        String horaf = LocalDateTime.now(Clock.systemUTC()).toString();
+                        String date = horaf.substring(0, 10);
+                        String horaFin = horaf.substring(11, horaf.length()-1);
+                        conn.savePedido(date, horaInicio, horaFin,ip.toString(),libro);
+                        conn.desconectar(); 
                     }else{
                         String libro = "AGOTADO";
                         sendingDataBuffer = libro.toUpperCase().getBytes();

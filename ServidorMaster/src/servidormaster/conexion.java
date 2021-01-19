@@ -184,6 +184,20 @@ public class conexion {
             System.err.println(e.getMessage());
         }
     }
+    
+    public void savePedido(String fecha, String horaInicio, String horaFin, String ip, String libro) throws SQLException{
+        //String database = "jdbc:mysql://localhost/biblioteca";
+        //conn = DriverManager.getConnection(database, "root", "password");
+        try {
+            Statement stmt = (Statement) conn.createStatement();          
+            String req = "INSERT INTO pedido (fecha, hora_inicio, hora_fin, ip, libro) VALUES ('"+fecha+"','" + horaInicio+"','" + horaFin + "','" + ip +"','" + libro + "');";
+            stmt.executeUpdate(req);
+            System.out.println ("Pedido Guardardo");
+        } catch (SQLException e) {
+            System.out.println("Error:");
+            System.out.println(e);
+        } 
+    };
 }
 
 
