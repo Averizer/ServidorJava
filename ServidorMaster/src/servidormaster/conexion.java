@@ -25,13 +25,15 @@ public class conexion {
     private final String url = "jdbc:mysql://localhost/biblioteca";
     PreparedStatement psPrepararSentencia;
     Connection conn = null;
+    String userDB = "root";
+    String passDB = "password";
     
 
     public void conectar(){
         try{   //Inicio del try
          
-         Class.forName("com.mysql.jdbc.Driver");     //Con el metodo de la clase forName, le pasamos el driver de MySQL para que lo cargue    
-         conn = DriverManager.getConnection(url,"root","");    //Apuntamos nuestro objeto con a el intento de conectarse con los parametros o las credenciales que tenemos en MYSQL
+         //Class.forName("com.mysql.jdbc.Driver");     //Con el metodo de la clase forName, le pasamos el driver de MySQL para que lo cargue    
+         conn = DriverManager.getConnection(url, userDB, passDB);    //Apuntamos nuestro objeto con a el intento de conectarse con los parametros o las credenciales que tenemos en MYSQL
         //Aqui mandamos la url donde viene la direccion de la BD, nuestro nombre de usuario y la contraseña, que por defecto al instalar viene vacia
         if (conn!=null){                         //Si logramos conectarnos, con deja de apuntar a null y obtenemos conexion
             System.out.println("Conexión a base de datos funcionando");                //Sin funciona imprimimos en consola un mensaje
@@ -41,10 +43,10 @@ public class conexion {
          {
          System.out.println(e);          //las mostramos en consola
          }
-         catch(ClassNotFoundException e)       //agarramos excepciones de tipo clase en java
+         /*catch(ClassNotFoundException e)       //agarramos excepciones de tipo clase en java
          {
           System.out.println(e);               //las mostramos en consola
-         }
+         }*/
     }
     
     public Connection conectado(){  //Este metodo de tipo Connection nos devuelve el estado del objeto
@@ -186,8 +188,8 @@ public class conexion {
     }
     
     public void savePedido(String fecha, String horaInicio, String horaFin, String ip, String libro) throws SQLException{
-        //String database = "jdbc:mysql://localhost/biblioteca";
-        //conn = DriverManager.getConnection(database, "root", "password");
+        String database = "jdbc:mysql://localhost/biblioteca";
+        conn = DriverManager.getConnection(database, "root", "password");
         try {
             Statement stmt = (Statement) conn.createStatement();          
             String req = "INSERT INTO pedido (fecha, hora_inicio, hora_fin, ip, libro) VALUES ('"+fecha+"','" + horaInicio+"','" + horaFin + "','" + ip +"','" + libro + "');";

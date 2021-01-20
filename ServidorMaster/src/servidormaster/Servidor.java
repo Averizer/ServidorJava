@@ -31,8 +31,16 @@ import javax.swing.plaf.basic.BasicSliderUI;
  */
 public class Servidor extends javax.swing.JFrame {
     public final static int SERVICE_PORT=10000;
+    public final static String SERVICE_HOST="127.0.0.1";
+    public final int portUTC = 5005;
+    public final static String hostUTC="127.0.0.1";
+    Timer hourUpdate;
+    int DELAY = 2000;
+    public DatagramSocket socketUTC = new DatagramSocket();
+    public InetAddress IPAddress = InetAddress.getByName(hostUTC);
     
-    public Servidor() {
+    public Servidor() throws IOException {
+        
         conexion conn = new conexion();
         conn.conectar();
         conn.reset();
@@ -42,6 +50,33 @@ public class Servidor extends javax.swing.JFrame {
         conn.desconectar();
         initComponents();
         txtDisponibles.setText(disponibles);
+        
+        hourUpdate = new Timer(DELAY, new ActionListener(){
+            
+            @Override
+            
+            public void actionPerformed(ActionEvent e){
+                byte[] getUTC = new byte[1024];
+                String sentence = LocalDateTime.now().toString();
+                String myHour = sentence.substring(11, sentence.length()-1);
+                getUTC = myHour.getBytes();
+                DatagramPacket packetUTC;
+                packetUTC = new DatagramPacket(getUTC, getUTC.length, IPAddress, portUTC);
+                LocalDateTime localDateTime = LocalDateTime.now();
+                String tiempoLocal = localDateTime.toString().substring(10, localDateTime.toString().length());
+                
+                try {
+                    socketUTC.send(packetUTC);
+                    socketUTC.receive(packetUTC);
+                    String receivedD = new String(packetUTC.getData());
+                    System.out.println("recibí: " + receivedD +" de "+ packetUTC.getPort());
+                } catch (IOException ex) {
+                    Logger.getLogger(Servidor.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                horaUTC.setText("L:"+tiempoLocal);
+            }
+        });
+        hourUpdate.start();
     }
       
     
@@ -54,12 +89,13 @@ public class Servidor extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
         labelImagen = new javax.swing.JLabel();
         restart = new javax.swing.JButton();
         adjust = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         txtDisponibles = new javax.swing.JTextArea();
+        jLabel3 = new javax.swing.JLabel();
+        horaUTC = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -67,9 +103,6 @@ public class Servidor extends javax.swing.JFrame {
                 formWindowClosing(evt);
             }
         });
-
-        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel1.setText("Server status: Running");
 
         labelImagen.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         labelImagen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/libros-grande.jpg"))); // NOI18N
@@ -94,45 +127,55 @@ public class Servidor extends javax.swing.JFrame {
         txtDisponibles.setRows(5);
         jScrollPane1.setViewportView(txtDisponibles);
 
+        jLabel3.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel3.setText("Server status: Running");
+
+        horaUTC.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        horaUTC.setText("Hora UTC:");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 371, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(175, 175, 175))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(adjust)
-                        .addGap(272, 272, 272))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(restart)
-                        .addGap(306, 306, 306))))
             .addGroup(layout.createSequentialGroup()
-                .addGap(107, 107, 107)
-                .addComponent(labelImagen, javax.swing.GroupLayout.PREFERRED_SIZE, 559, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(70, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel1)
-                .addGap(267, 267, 267))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(167, 167, 167)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(labelImagen, javax.swing.GroupLayout.PREFERRED_SIZE, 307, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 371, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(adjust)
+                                .addGap(41, 41, 41)
+                                .addComponent(horaUTC, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(285, 285, 285)
+                        .addComponent(restart)))
+                .addContainerGap(113, Short.MAX_VALUE))
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                    .addContainerGap(256, Short.MAX_VALUE)
+                    .addComponent(jLabel3)
+                    .addGap(193, 193, 193)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(29, 29, 29)
-                .addComponent(jLabel1)
-                .addGap(18, 18, 18)
-                .addComponent(labelImagen, javax.swing.GroupLayout.PREFERRED_SIZE, 494, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(40, 40, 40)
+                .addComponent(labelImagen, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(restart)
-                .addGap(18, 18, 18)
-                .addComponent(adjust)
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(45, 45, 45))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 19, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(adjust)
+                    .addComponent(horaUTC))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                    .addGap(22, 22, 22)
+                    .addComponent(jLabel3)
+                    .addContainerGap(401, Short.MAX_VALUE)))
         );
 
         pack();
@@ -152,7 +195,7 @@ public class Servidor extends javax.swing.JFrame {
         DatagramSocket respaldoSocket;
         try {
             respaldoSocket = new DatagramSocket();
-            String ipreslpaldo = "192.168.0.195";
+            String ipreslpaldo = SERVICE_HOST;
             InetAddress ipRespaldo = InetAddress.getByName(ipreslpaldo);
             byte[] receivingDataBuffer2 = new byte[1024];
             byte[] sendingDataBuffer2 = new byte[1024];
@@ -189,7 +232,9 @@ public class Servidor extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) throws SQLException {
+    public static void main(String args[]) throws SQLException, IOException {
+        String libros = "/home/luis/Escritorio/ESCOM/"
+            + "Distribuidos/P3/ServidorJava/ServidorMaster/src/img/";
         Servidor s = new Servidor();
         s.setVisible(true);
         try{
@@ -233,8 +278,8 @@ public class Servidor extends javax.swing.JFrame {
                     s.txtDisponibles.setText(disponibles);
                     sendingDataBuffer = respuesta.toUpperCase().getBytes();
                     //-----------------REPLICADO----------------------
-                    DatagramSocket respaldoSocket = new DatagramSocket();
-                    String ipreslpaldo = "192.168.0.195";
+                    /*DatagramSocket respaldoSocket = new DatagramSocket();
+                    String ipreslpaldo = SERVICE_HOST;
                     InetAddress ipRespaldo = InetAddress.getByName(ipreslpaldo);
                     byte[] receivingDataBuffer2 = new byte[1024];
                     byte[] sendingDataBuffer2 = new byte[1024];
@@ -244,7 +289,7 @@ public class Servidor extends javax.swing.JFrame {
                     respaldoSocket.send(sendingPacket2);
                     DatagramPacket rec = new DatagramPacket(receivingDataBuffer2, receivingDataBuffer2.length, ipRespaldo, SERVICE_PORT);
                     respaldoSocket.receive(rec);
-                    respaldoSocket.close();
+                    respaldoSocket.close();*/
                 }else if(receivedData.contains("ASK")){
                     //Pedir libros disponibles hacer random entre la lista y devolver nombre
                     //Con el nombre mostrar la imagen
@@ -266,11 +311,11 @@ public class Servidor extends javax.swing.JFrame {
                         
                         s.txtDisponibles.setText(disponibles);
                         s.labelImagen.setIcon(new ImageIcon
-                        ("C:\\Users\\emili\\Desktop\\ServidorJava\\ServidorMaster\\src\\img\\"+libro+".jpg"));
+                        (libros+libro+".jpg"));
                         sendingDataBuffer = libro.toUpperCase().getBytes();
                         
                         //-----------------REPLICADO----------------------
-                        DatagramSocket respaldoSocket = new DatagramSocket();
+                       /* DatagramSocket respaldoSocket = new DatagramSocket();
                         String ipreslpaldo = "192.168.0.195";
                         InetAddress ipRespaldo = InetAddress.getByName(ipreslpaldo);
                         byte[] receivingDataBuffer2 = new byte[1024];
@@ -286,15 +331,15 @@ public class Servidor extends javax.swing.JFrame {
                         String date = horaf.substring(0, 10);
                         String horaFin = horaf.substring(11, horaf.length()-1);
                         conn.savePedido(date, horaInicio, horaFin,ip.toString(),libro);
-                        conn.desconectar(); 
+                        conn.desconectar(); */
                     }else{
                         String libro = "AGOTADO";
                         sendingDataBuffer = libro.toUpperCase().getBytes();
                         conn.desconectar();
                         s.labelImagen.setIcon(new ImageIcon
-                        ("C:\\Users\\emili\\Desktop\\ServidorJava\\ServidorMaster\\src\\img\\liibros-grande.jpg"));
+                        (libros+"liibros-grande.jpg"));
                         //-----------------REPLICADO----------------------
-                        DatagramSocket respaldoSocket = new DatagramSocket();
+                        /*DatagramSocket respaldoSocket = new DatagramSocket();
                         String ipreslpaldo = "192.168.0.195";
                         InetAddress ipRespaldo = InetAddress.getByName(ipreslpaldo);
                         byte[] receivingDataBuffer2 = new byte[1024];
@@ -305,7 +350,7 @@ public class Servidor extends javax.swing.JFrame {
                         respaldoSocket.send(sendingPacket2);
                         DatagramPacket rec = new DatagramPacket(receivingDataBuffer2, receivingDataBuffer2.length, ipRespaldo, SERVICE_PORT);
                         respaldoSocket.receive(rec);
-                        respaldoSocket.close();
+                        respaldoSocket.close();*/
                     }
                     
                     
@@ -323,7 +368,7 @@ public class Servidor extends javax.swing.JFrame {
                     String libro = "OK";
                     sendingDataBuffer = libro.toUpperCase().getBytes();
                     //-----------------REPLICADO----------------------
-                    DatagramSocket respaldoSocket = new DatagramSocket();
+                    /*DatagramSocket respaldoSocket = new DatagramSocket();
                     String ipreslpaldo = "192.168.0.195";
                     InetAddress ipRespaldo = InetAddress.getByName(ipreslpaldo);
                     byte[] receivingDataBuffer2 = new byte[1024];
@@ -334,7 +379,7 @@ public class Servidor extends javax.swing.JFrame {
                     respaldoSocket.send(sendingPacket2);
                     DatagramPacket rec = new DatagramPacket(receivingDataBuffer2, receivingDataBuffer2.length, ipRespaldo, SERVICE_PORT);
                     respaldoSocket.receive(rec);
-                    respaldoSocket.close();
+                    respaldoSocket.close();*/
                     
                     
                 }   
@@ -363,7 +408,8 @@ public class Servidor extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton adjust;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel horaUTC;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel labelImagen;
     private javax.swing.JButton restart;
